@@ -14,12 +14,22 @@ public class TimetableManager {
         String line;
 
         while ((line = reader.readLine()) != null) {
-            String[] parts = line.split(":");
-            String room = parts[0].trim();
-            String times = parts[1].trim();
+            // 하나의 수업이 2개 이상의 강의실을 사용하는 경우, 각 강의실을 , 를 기준으로 분리
+            String[] parts = line.split(", ");
 
-            timetable.putIfAbsent(room, new ArrayList<>());
-            timetable.get(room).add(times);
+            for (String part : parts) {
+                String[] roomSchedule = part.split(":", 2);  // 강의실 이름과 시간표 부분을 구분
+                if (roomSchedule.length != 2) {
+                    continue;
+                }
+
+                String room = roomSchedule[0].trim();  // 강의실 이름
+                String scheduleString = roomSchedule[1].trim();  // 시간표 정보
+
+                // 해당 강의실에 시간표를 추가
+                timetable.putIfAbsent(room, new ArrayList<>());
+                timetable.get(room).add(scheduleString);
+            }
         }
 
         reader.close();
