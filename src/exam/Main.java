@@ -16,7 +16,12 @@ public class Main {
             System.out.println(entry);
         }
 
-
+        boolean isInUse = t.isRoomInUse(room);
+        if (isInUse) {
+            System.out.println("현재 강의실이 사용 중입니다.");
+        } else {
+            System.out.println("현재 강의실이 비어 있습니다.");
+        }
 
     }
 }

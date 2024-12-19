@@ -103,6 +103,32 @@ public class TimetableManager {
         return formattedSchedule;
     }
 
+    // 현재 시간과 비교
+    public boolean isRoomInUse(String room) {
+        List<String> formattedSchedule = getFormattedSchedule(room);
+        LocalTime now = LocalTime.now();
 
+        for (String schedule : formattedSchedule) {
+            String[] parts = schedule.split("요일 ");
+            if (parts.length != 2) {
+                continue;
+            }
+
+            String timeRange = parts[1];
+            String[] times = timeRange.split("~");
+            if (times.length != 2) {
+                continue;
+            }
+
+            LocalTime startTime = LocalTime.parse(times[0].trim());
+            LocalTime endTime = LocalTime.parse(times[1].trim());
+
+            if (now.isAfter(startTime) && now.isBefore(endTime)) {
+                return true; // 현재 시간에 강의실이 사용 중
+            }
+        }
+
+        return false; // 현재 시간에 강의실이 비어 있음
+    }
 
 }
