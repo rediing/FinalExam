@@ -3,6 +3,8 @@ package exam;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -107,14 +109,25 @@ public class TimetableManager {
     public boolean isRoomInUse(String room) {
         List<String> formattedSchedule = getFormattedSchedule(room);
         LocalTime now = LocalTime.now();
+        DayOfWeek today = LocalDate.now().getDayOfWeek(); // 현재 요일 (월요일 ~ 일요일)
 
         for (String schedule : formattedSchedule) {
+            // "요일 "로 분리하여 요일과 시간 구간 추출
             String[] parts = schedule.split("요일 ");
             if (parts.length != 2) {
                 continue;
             }
 
-            String timeRange = parts[1];
+            String day = parts[0]; // 요일 부분
+            String timeRange = parts[1]; // 시간 구간
+
+            // 요일 문자열을 DayOfWeek로 변환
+            DayOfWeek scheduleDay = convertToDayOfWeek(day);
+            if (scheduleDay == null || scheduleDay != today) {
+                continue; // 현재 요일과 다르면 건너뜀
+            }
+
+            // 시간 구간 파싱
             String[] times = timeRange.split("~");
             if (times.length != 2) {
                 continue;
@@ -123,12 +136,27 @@ public class TimetableManager {
             LocalTime startTime = LocalTime.parse(times[0].trim());
             LocalTime endTime = LocalTime.parse(times[1].trim());
 
+            // 현재 시간이 시간 구간에 속하는지 확인
             if (now.isAfter(startTime) && now.isBefore(endTime)) {
                 return true; // 현재 시간에 강의실이 사용 중
             }
         }
 
-        return false; // 현재 시간에 강의실이 비어 있음
+        return false; // 현재 요일과 시간에 강의실이 비어 있음
+    }
+
+    // 요일 문자열을 DayOfWeek로 변환
+    private DayOfWeek convertToDayOfWeek(String day) {
+        switch (day) {
+            case "월": return DayOfWeek.MONDAY;
+            case "화": return DayOfWeek.TUESDAY;
+            case "수": return DayOfWeek.WEDNESDAY;
+            case "목": return DayOfWeek.THURSDAY;
+            case "금": return DayOfWeek.FRIDAY;
+            case "토": return DayOfWeek.SATURDAY;
+            case "일": return DayOfWeek.SUNDAY;
+            default: return null;
+        }
     }
 
 }
