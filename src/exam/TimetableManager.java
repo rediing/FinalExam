@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -106,7 +107,7 @@ public class TimetableManager {
     }
 
     // 현재 시간과 비교
-    public boolean isRoomInUse(String room) {
+    public String isRoomInUse(String room) {
         List<String> formattedSchedule = getFormattedSchedule(room);
         LocalTime now = LocalTime.now();
         DayOfWeek today = LocalDate.now().getDayOfWeek(); // 현재 요일 (월요일 ~ 일요일)
@@ -138,11 +139,16 @@ public class TimetableManager {
 
             // 현재 시간이 시간 구간에 속하는지 확인
             if (now.isAfter(startTime) && now.isBefore(endTime)) {
-                return true; // 현재 시간에 강의실이 사용 중
+                Duration timeLeft = Duration.between(now,endTime);
+                long convertMin = timeLeft.toMinutes();
+                long hours = convertMin / 60;
+                long mins = convertMin % 60;
+
+                return "강의실이 사용 중입니다. 강의 종료까지 남은 시간: " + (hours > 0 ? hours + "시간" : "") + mins + "분"; // 현재 시간에 강의실이 사용 중
             }
         }
 
-        return false; // 현재 요일과 시간에 강의실이 비어 있음
+        return "현재 강의실이 비어 있습니다."; // 현재 요일과 시간에 강의실이 비어 있음
     }
 
     // 요일 문자열을 DayOfWeek로 변환
